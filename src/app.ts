@@ -11,7 +11,7 @@ import { tvJsonProcessor } from './jsonProcessor'
 
 // express.Application
 const app: Application = express()
-// const port = process.env.port || 9999
+const PORT = process.env.PORT || 5000
 
 // middle ware
 app.get('/', (
@@ -46,7 +46,7 @@ app.get('/test', async (
 })
 
 
-app.listen(5000, () => console.log('Server running'))
+app.listen(PORT, () => console.log('Server running'))
 
 // res.send(JSON.stringify(nineResp.data, null, 10))  JSON.stringify(results, null, 2) + '\n'
         // res.json(nineResp.data)
