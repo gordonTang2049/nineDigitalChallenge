@@ -46,7 +46,7 @@ app.get('/test', async (
 })
 
 
-app.listen(9999, () => console.log('Server running'))
+app.listen(5000, () => console.log('Server running'))
 
 // res.send(JSON.stringify(nineResp.data, null, 10))  JSON.stringify(results, null, 2) + '\n'
         // res.json(nineResp.data)
