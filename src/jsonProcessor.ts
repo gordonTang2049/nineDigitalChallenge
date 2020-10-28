@@ -1,94 +1,17 @@
 
-// type Valueof <T extends Record<>, K>= {       
-// T extends Record<T, T[]>
-/*
-type DistributiveValues<T extends Record<string, T[]>> = T extends T ? T[keyof T] : never;
-
-type InnerValues<
-K extends keyof T,
-T extends Record<K, T[]>
-> = DistributiveValues<T[K]>;
-
-T, K extends keyof T
-
-constraints to check an object key exists
-function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
-    return obj[key];
-}
-
-            (tvShow.drm && tvShow.episodeCount) && {
-
-            }
+import { Validator } from 'jsonschema'
+import { type } from 'os'
 
 
+export const tvJsonProcessor = (tvShowsDetails: Object[]) => {
 
-            // console.log(tvShow.drm)
-    // if(tvShow.episodeCount){
-    //     console.log(tvShow.episodeCount) 
-    // }
-    // (tvShow.drm && tvShow.episodeCount) && tvShow.image.showImage
-    // return tvShowsBrief
-
-type test<T extends Record<string, T[]>> = {}
-
-// type Valueof<T extends Record<>> = {}
-
-
-type TvShow <T, K extends keyof T> = {
-    K : T[K]
-}
-
-type tvShowKey <T> = keyof typeof T
-
-<K extends keyof any, T>
-{[P in K] : T}
-// (type parameter) T in <T, P extends keyof T>(tvShow: Record<T, T[P]>): void
-
-type MyMappedEntireType<T> = {
-
-    [P in keyof T]: T[P]
-}
-
-
-// const wrapEntries = new Map([
-            //     ["response", entriesObj]
-            // ])
-
-            // const tvShowsBriefObj = Object.fromEntries(entriesObj)
-
-            .hasOwnProperty
-*/
-// How to type in better form 
-
-
-// .map((tvShow: any) => {
-
-
-//     console.log(tvShow.drm)
-//     console.log(tvShow.episodeCount)
-
-//     if (tvShow.drm && tvShow.episodeCount) {
-
-//         console.log(entriesObj)
-
-//         return entriesObj
-
-//     }
-
-// })
-
-export const tvJsonProcessor = (incomingJson: Object) => {
-
-    const tvShowsDetails = Object.values(incomingJson)[0]
-
-    console.log(tvShowsDetails.length)
-
+    
     const tvShowsBrief = tvShowsDetails
         .filter((tvShow: any) => {
             return (tvShow.drm && tvShow.episodeCount)
         })
         .map((tvShow: any) => {
-            
+
             const title = tvShow.title
             const slug = tvShow.slug
             const image = tvShow.image.showImage
@@ -104,10 +27,82 @@ export const tvJsonProcessor = (incomingJson: Object) => {
             return entriesObj
         })
 
+        const jsonEntries = new Map([
+            ["response", tvShowsBrief]
+        ])
 
-    return tvShowsBrief
+        const respJson = Object.fromEntries(jsonEntries)
+
+    return respJson
+
+}
+
+export const errorHandlingJson = () => {
+    const entries = new Map([
+        ["error", "Could not decode request: JSON parsing failed"]
+    ])
+
+    const entriesObj = Object.fromEntries(entries)
+
+    return entriesObj
 
 }
 
 
+export const validateIncJson = (incJsonVal: Object[]): boolean => {
 
+    const validatorKeys = ["drm", "episodeCount", "image", "slug", "title"]
+
+    let isValid: boolean = false
+
+    if (typeof incJsonVal[0] === 'object') {
+
+        incJsonVal.forEach(jsonVal => {
+
+            const validator: boolean[] = []
+
+            validatorKeys.forEach(key => {
+
+                const hasProp = jsonVal.hasOwnProperty(key)
+
+                hasProp && validator.push(true)
+
+                validator.length === 5 && (isValid = true)
+
+            })
+
+        })
+
+    }
+
+    return isValid
+
+}
+
+
+//  T extends string ? string : never) :void 
+// type TvShowJson = {
+//     country: string
+//     description: string
+//     drm: boolean
+//     episodeCount: number
+//     genre: string
+//     image: {
+//         showImage: string
+//     }
+//     language : string 
+//     nextEpisode : string
+//     primaryColour : string 
+//     seasons : string 
+//     slug : string 
+//     title : string 
+//     tvChannel : string 
+// }
+
+// = Parameters<typeof A>
+
+// {
+//     "slug": "show/seapatrol",
+//         "title": "Sea Patrol",
+//             "tvChannel": "Channel 9"
+// }

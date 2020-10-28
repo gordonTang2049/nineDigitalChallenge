@@ -1,52 +1,101 @@
-// 
+//  tested production quality code. 
+//  
+import cors from 'cors'
 import express, {
     Application,
     Request,
     Response,
-    NextFunction
+    NextFunction,
+    ErrorRequestHandler
 } from 'express'
 
-import axios from 'axios'
-import { tvJsonProcessor } from './jsonProcessor'
+import bodyParser from 'body-parser'
+import {
+    errorHandlingJson,
+    tvJsonProcessor,
+    validateIncJson
+} from './jsonProcessor'
 
 // express.Application
+
 const app: Application = express()
 const PORT = process.env.PORT || 5000
 
-// middle ware
-app.get('/', (
-    req: Request,
-    res: Response
-    // next: NextFunction
-) => {
-    res.send('Hello world')
-})
+app.use(cors())
+app.use(bodyParser.json())
 
-app.get('/test', async (
+app.use((
+    err: ErrorRequestHandler,
     req: Request,
-    res: Response
+    res: Response,
+    next: NextFunction
 ) => {
 
-    try {
-        const nineResp = await axios.get('http://codingchallenge.nine.com.au/sample_request.json')
+    if (err && err.name === 'SyntaxError') {
 
-        const results = tvJsonProcessor(nineResp.data)
+        console.log(req.body)
 
-        console.log(results)
+        res.status(400)
+        res.json(errorHandlingJson())
 
-        res.send(results)
-        
+    } else {
 
-    } catch (e) {
-
-        res.send(e)
+        next()
 
     }
 
+
+});
+
+app.post('/', (req: Request, res: Response) => {
+
+    const isJson = req.is('json')
+    
+    if (isJson) {
+        const incJson = req.body
+
+        const incJsonKey: string = Object.keys(incJson)[0]
+        const incJsonVal = Object.values(incJson)[0]
+
+        // console.log(incJsonVal)
+
+
+        if (incJsonKey === "payload" && Array.isArray(incJsonVal)) {
+
+            const isValidJson = validateIncJson(incJsonVal)
+
+            if (isValidJson) {
+
+                const tvShowBriefs = tvJsonProcessor(incJsonVal)
+                res.json(tvShowBriefs)
+            } else {
+
+                res.status(400)
+                res.json(errorHandlingJson())
+            }
+
+
+        } else {
+
+            res.status(400)
+            res.json(errorHandlingJson())
+
+        }
+
+    } else {
+
+        res.status(400)
+        res.json(errorHandlingJson())
+    }
+
+
 })
+
+
+
 
 
 app.listen(PORT, () => console.log('Server running'))
 
-// res.send(JSON.stringify(nineResp.data, null, 10))  JSON.stringify(results, null, 2) + '\n'
-        // res.json(nineResp.data)
+
+
